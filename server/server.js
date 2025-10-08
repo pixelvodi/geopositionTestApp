@@ -17,9 +17,19 @@ app.post('/getworks', (req, res) => {
   console.log('Получена локация от клиента:', latitude, longitude);
 
   db.all(
-    `SELECT * FROM shifts WHERE 
-     latitude BETWEEN ? AND ? AND 
-     longitude BETWEEN ? AND ?`,
+    `SELECT 
+      shifts.*, 
+      work_types.name AS work_type_name,
+      work_types.name_gt5,
+      work_types.name_lt5,
+      work_types.name_one
+    FROM 
+      shifts
+    LEFT JOIN 
+      work_types ON shifts.work_type_id = work_types.id
+    WHERE 
+      shifts.latitude BETWEEN ? AND ?
+      AND shifts.longitude BETWEEN ? AND ?`,
     [latitude - delta, latitude + delta, longitude - delta, longitude + delta],
     (err, rows) => {
       if (err) {
